@@ -90,9 +90,9 @@ class RootObjectTypeFieldResolver extends AbstractObjectTypeFieldResolver
     public function getFieldDescription(ObjectTypeResolverInterface $objectTypeResolver, string $fieldName): ?string
     {
         return match ($fieldName) {
-            'optionValue' => $this->__('Single-value option saved in the DB, of any built-in scalar type', 'pop-settings'),
-            'optionValues' => $this->__('Array-value option saved in the DB, of any built-in scalar type', 'pop-settings'),
-            'optionObjectValue' => $this->__('Object-value option saved in the DB', 'pop-settings'),
+            'optionValue' => $this->__('Single-value option saved in the DB, of any built-in scalar type, or `null` if entry does not exist', 'pop-settings'),
+            'optionValues' => $this->__('Array-value option saved in the DB, of any built-in scalar type, or `null` if entry does not exist', 'pop-settings'),
+            'optionObjectValue' => $this->__('Object-value option saved in the DB, or `null` if entry does not exist', 'pop-settings'),
             default => parent::getFieldDescription($objectTypeResolver, $fieldName),
         };
     }
@@ -209,6 +209,9 @@ class RootObjectTypeFieldResolver extends AbstractObjectTypeFieldResolver
             case 'optionValues':
             case 'optionObjectValue':
                 $value = $this->getSettingsTypeAPI()->getOption($fieldDataAccessor->getValue('name'));
+                if ($value === null) {
+                    return null;
+                }
                 if ($fieldDataAccessor->getFieldName() === 'optionValues') {
                     return (array) $value;
                 }
